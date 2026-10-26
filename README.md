@@ -59,6 +59,23 @@ to follow the building from source instructions below.
 Release builds for Windows and macOS are signed: see the
 [Code signing policy](docs/code-signing-policy.md).
 
+### Flatpak
+
+If you run OBS Studio from Flathub (`com.obsproject.Studio`), the `.deb`
+package can't be used: install the plugin as an OBS Studio extension instead.
+Until it is published on Flathub, build it from a checkout of this repo. You
+need `flatpak-builder` and the `org.freedesktop.Sdk//26.08` SDK, which is the
+runtime branch OBS Studio's Flatpak currently uses:
+
+```
+$ flatpak install flathub org.freedesktop.Sdk//26.08
+$ flatpak-builder --user --install --force-clean build-flatpak \
+      build-aux/com.obsproject.Studio.Plugin.PTZControls.json
+```
+
+Restart OBS Studio, then follow the Configuration steps below. To remove the
+plugin, run `flatpak uninstall com.obsproject.Studio.Plugin.PTZControls`.
+
 ## Configuration
 
 To show the controls dock, in the `Docks` menu select `PTZ Controls`.
