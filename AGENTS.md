@@ -46,6 +46,30 @@ from just reading the code.
   `obs-studio` package name instead survives that upgrade cleanly — verified against
   the real PPA package, not just reasoned about (see `b665184`).
 
+## Flatpak extension
+
+`build-aux/com.obsproject.Studio.Plugin.PTZControls.{json,metainfo.xml}` build obs-ptz
+as an extension of the OBS Studio Flatpak, installed in `/app/plugins/PTZControls`.
+Build it with the command in the README. Things that go wrong:
+
+- The `sdk` has to match OBS's runtime branch (`org.freedesktop.Sdk//26.08` now), so
+  bump it each time the OBS Flatpak moves to a new runtime. Check with
+  `flatpak info com.obsproject.Studio`.
+- The manifest sets `"branch": "stable"`. Without it flatpak-builder installs branch
+  `master`, which OBS never mounts, and the plugin silently doesn't load.
+- Don't use the Ubuntu presets here. They set a multiarch `CMAKE_INSTALL_LIBDIR`, which
+  installs the plugin where OBS doesn't look; flatpak-builder sets `lib` itself.
+- The `dir` source skips `.flatpak-builder` and `build-flatpak`, or it copies the build
+  directory into itself.
+- The plugin uses the legacy layout, `lib/obs-plugins` and `share/obs/obs-plugins`
+  (see `cmake/linux/helpers.cmake`). OBS 33.0.0's Flatpak loader builds the data path
+  of the new `obs-modules/plugins` layout without `obs/`, so the module loads but its
+  locale files aren't found. Move to the new layout once OBS fixes that.
+- The OBS Flatpak has no Qt6SerialPort, so the manifest builds upstream `qtserialport`
+  (same version as OBS's Qt, now 6.11.1) against it. Rebuild and check that serial
+  still works after each Qt update in the OBS Flatpak. `shared/qtserialport` leaves out
+  Linux on purpose.
+
 ## Releases
 
 - `action-gh-release` + `draft: true` means GitHub doesn't attach a real git tag to
