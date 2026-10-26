@@ -1,0 +1,62 @@
+{
+  "id": "com.obsproject.Studio.Plugin.PTZControls",
+  "branch": "stable",
+  "runtime": "com.obsproject.Studio",
+  "runtime-version": "stable",
+  "sdk": "org.freedesktop.Sdk//26.08",
+  "build-extension": true,
+  "separate-locales": false,
+  "build-options": { "prefix": "/app/plugins/PTZControls" },
+  "modules": [
+    {
+      "name": "qtserialport",
+      "buildsystem": "cmake-ninja",
+      "config-opts": [
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_PREFIX_PATH=/app",
+        "-DQT_BUILD_EXAMPLES=OFF",
+        "-DQT_BUILD_TESTS=OFF"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://download.qt.io/official_releases/qt/6.11/6.11.1/submodules/qtserialport-everywhere-src-6.11.1.tar.xz",
+          "sha256": "9af31a898ffd9a7e4faf6fed845d29e783c716885789055cbe319f3e072d3974"
+        }
+      ],
+      "cleanup": ["/include", "/lib/cmake", "/lib/pkgconfig", "/lib/*.prl", "/lib/metatypes", "/mkspecs", "/modules"]
+    },
+    {
+      "name": "obs-ptz",
+      "buildsystem": "cmake-ninja",
+      "builddir": true,
+      "config-opts": [
+        "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+        "-DCMAKE_PREFIX_PATH=/app",
+        "-DENABLE_SERIALPORT=ON",
+        "-DENABLE_JOYSTICK=ON",
+        "-DENABLE_USB_CAM=ON"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "..",
+          "skip": [".flatpak-builder", "build-flatpak"]
+        }
+      ]
+    },
+    {
+      "name": "metainfo",
+      "buildsystem": "simple",
+      "sources": [
+        {
+          "type": "file",
+          "path": "com.obsproject.Studio.Plugin.PTZControls.metainfo.xml"
+        }
+      ],
+      "build-commands": [
+        "install -Dm644 ${FLATPAK_ID}.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="addon">
+  <id>com.obsproject.Studio.Plugin.PTZControls</id>
+  <extends>com.obsproject.Studio</extends>
+  <name>PTZ Camera Control</name>
+  <summary>Control PTZ cameras from OBS Studio</summary>
+  <developer id="ca.secretlab">
+    <name translate="no">Grant Likely</name>
+  </developer>
+  <url type="homepage">https://github.com/glikely/obs-ptz</url>
+  <url type="vcs-browser">https://github.com/glikely/obs-ptz</url>
+  <url type="bugtracker">https://github.com/glikely/obs-ptz/issues</url>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <releases>
+    <release version="1.0.0-beta2" date="2026-10-25"/>
+  </releases>
+</component>
