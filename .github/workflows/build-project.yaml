@@ -252,6 +252,66 @@ jobs:
           path: ${{ github.workspace }}/.ccache
           key: ${{ runner.os }}-${{ matrix.os }}-ccache-${{ matrix.target }}-${{ needs.check-event.outputs.config }}
 
+  flatpak-build:
+    name: Build Flatpak 📦
+    runs-on: ubuntu-26.04
+    needs: check-event
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set Up Environment 🔧
+        id: setup
+        run: |
+          : Set Up Environment 🔧
+          if [[ "${RUNNER_DEBUG}" ]]; then set -x; fi
+
+          read -r product_name product_version <<< \
+            "$(jq -r '. | {name, version} | join(" ")' buildspec.json)"
+
+          echo "pluginName=${product_name}" >> $GITHUB_OUTPUT
+          echo "pluginVersion=${product_version}" >> $GITHUB_OUTPUT
+
+      - name: Install Flatpak Tools 🔧
+        run: |
+          : Install Flatpak Tools 🔧
+          if [[ "${RUNNER_DEBUG}" ]]; then set -x; fi
+
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+      - name: Build Flatpak 🧱
+        run: |
+          : Build Flatpak 🧱
+          if [[ "${RUNNER_DEBUG}" ]]; then set -x; fi
+
+          # The manifest builds with warnings as errors, like the other jobs
+          flatpak-builder --user --install-deps-from=flathub --force-clean --repo=repo \
+            build-flatpak build-aux/com.obsproject.Studio.Plugin.PTZControls.json
+
+      - name: Package Flatpak 📀
+        run: |
+          : Package Flatpak 📀
+          if [[ "${RUNNER_DEBUG}" ]]; then set -x; fi
+
+          mkdir -p release
+          # --runtime: an OBS Studio extension is a runtime ref, not an app
+          flatpak build-bundle --runtime repo \
+            "release/${{ steps.setup.outputs.pluginName }}-${{ steps.setup.outputs.pluginVersion }}-flatpak-x86_64.flatpak" \
+            com.obsproject.Studio.Plugin.PTZControls stable
+
+      - name: Upload Artifacts 📡
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.setup.outputs.pluginName }}-${{ steps.setup.outputs.pluginVersion }}-flatpak-x86_64-${{ needs.check-event.outputs.commitHash }}
+          path: ${{ github.workspace }}/release/*.flatpak
+
   windows-build:
     name: Build for Windows 🪟
     strategy:
