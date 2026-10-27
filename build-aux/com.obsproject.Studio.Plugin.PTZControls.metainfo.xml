@@ -4,6 +4,9 @@
   <extends>com.obsproject.Studio</extends>
   <name>PTZ Camera Control</name>
   <summary>Control PTZ cameras from OBS Studio</summary>
+  <description>
+    <p>Adds a dock to OBS Studio for panning, tilting and zooming PTZ cameras, with presets and joystick control. It works with VISCA over IP and serial, Pelco-D and Pelco-P, ONVIF and USB (UVC) cameras.</p>
+  </description>
   <developer id="ca.secretlab">
     <name translate="no">Grant Likely</name>
   </developer>
